@@ -1,5 +1,5 @@
 import type { Cipher, Params } from './types';
-import { pick, words } from './util';
+import { levels, para, pick, words } from './util';
 
 /** 原創短文：A–Z 每個字母都至少有一個單字開頭 */
 export const BOOK =
@@ -23,9 +23,14 @@ export const beale: Cipher = {
       if (!ix.length) { if (!miss.includes(c)) miss += c; return '?'; }
       return ix[pick(rng, ix.length)];
     }).join(' ')).join(' / ');
+    const first = text.split(/[\s/]+/)[0];
     return {
       text,
-      hint: [{ k: 'p', text: '每個數字代表下面書中的第幾個單字，取它的第一個字母：' }, { k: 'book', words: bw }],
+      hint: levels([
+        [para('每個數字都指向下面這本書裡的某個位置；「/」分開單字。')],
+        [para(`已經有人破解了第一個數字：${first} 指的是書中第 ${first} 個單字「${bw[+first - 1] ?? ''}」，代表字母「${bw[+first - 1]?.[0].toUpperCase() ?? ''}」。`)],
+        [para('數字是書中的第幾個單字（從 1 開始數），取那個單字的第一個字母。同一個字母可能用不同數字表示。')],
+      ], [para('書本（解題材料）：'), { k: 'book', words: bw }]),
       note: miss ? '書中缺少這些字母，顯示為 ?：' + miss : '書中字母足夠',
     };
   },

@@ -26,6 +26,13 @@ export function checkCipher(c: Cipher, o: Opts = {}) {
   // 文字或圖形二擇一，提示不可為空
   expect(Boolean(clean.text) || Boolean(clean.glyphs?.length)).toBe(true);
   expect(clean.hint.length).toBeGreaterThan(0);
+  // 分層提示卡：3～4 張，每張都有內容，不能出現 undefined
+  const lv = clean.hint.find((b) => b.k === 'levels');
+  if (lv?.k !== 'levels') throw new Error(`${c.id} 缺少分層提示卡`);
+  expect(lv.cards.length).toBeGreaterThanOrEqual(3);
+  expect(lv.cards.length).toBeLessThanOrEqual(4);
+  for (const card of lv.cards) expect(card.length).toBeGreaterThan(0);
+  expect(JSON.stringify(clean.hint)).not.toMatch(/undefined|NaN/);
   if (clean.text) expect(clean.text).not.toMatch(/undefined|NaN/);
   if (c.decrypt && clean.text) {
     let back = c.decrypt(clean.text, p);

@@ -1,5 +1,5 @@
 import type { Cipher, Params } from './types';
-import { A, alphaTable, mod, numOr, subst, unsubst } from './util';
+import { A, alphaTable, exampleTable, levels, mod, numOr, para, subst, unsubst } from './util';
 
 const COPRIME = [1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25];
 const ab = (p: Params) => {
@@ -21,7 +21,12 @@ export const affine: Cipher = {
     const { a, b } = ab(p), to = table(a, b);
     return {
       text: subst(s, to),
-      hint: [{ k: 'p', text: `加密公式：E(x)=(${a}x+${b}) mod 26，A=0、B=1……。可只給公式提高難度，或附對照表：` }, alphaTable(to)],
+      hint: levels([
+        [para('每個字母都換成另一個字母，換法由一條數學公式決定：先把字母換成數字，乘一個數，再加一個數。')],
+        [para('已經有人破解了這兩個字母：'), exampleTable(s, (c) => to[A.indexOf(c)])],
+        [para(`加密公式：密文編號＝(${a}×原文編號＋${b}) 除以 26 的餘數，A=0、B=1……Z=25。試著把 A 到 Z 都算一遍，做出對照表。`)],
+        [para('完整對照表：上排原文、下排密文。'), alphaTable(to)],
+      ]),
       note: `a=${a}，b=${b}`,
     };
   },

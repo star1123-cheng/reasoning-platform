@@ -11,7 +11,11 @@ export type HintBlock =
   | { k: 'p'; text: string }
   | { k: 'table'; rows: Cell[][] }
   | { k: 'legend'; items: { label: string; glyph?: Glyph; sub?: string }[] }
-  | { k: 'book'; words: string[] };
+  | { k: 'book'; words: string[] }
+  /** 空白的共濟會格子（兩個井字格、兩個 X 字格），讓學生自己填字母 */
+  | { k: 'pigGrid' }
+  /** 分層提示卡：由淺到深，學生卡住時才逐張翻開；列印時全部印出 */
+  | { k: 'levels'; cards: HintBlock[][] };
 
 export type ParamValue = string | number | boolean;
 export type Params = Record<string, ParamValue>;

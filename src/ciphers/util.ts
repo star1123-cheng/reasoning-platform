@@ -69,3 +69,38 @@ export const colDecrypt = (c: string, k: string): string => {
 
 /** 依參數定義取得預設值 */
 export const defaults = (defs: ParamDef[]): Params => Object.fromEntries(defs.map((d) => [d.k, d.v]));
+
+/** 純文字提示段落 */
+export const para = (text: string): HintBlock => ({ k: 'p', text });
+
+/**
+ * 分層提示：由淺到深（方向 → 已知例子 → 規則 → 完整對照表），學生卡住時才逐張翻開。
+ * tools 是解題本來就需要的材料（例如書本、方陣），不算答案，一直顯示在提示卡上方。
+ */
+export const levels = (cards: HintBlock[][], tools: HintBlock[] = []): HintBlock[] => [
+  para('卡住時才翻開下一張提示卡，盡量用最少的提示破解。'),
+  ...tools,
+  { k: 'levels', cards },
+];
+
+/** 已知例子：取明文中出現最多次的 n 個字母（同次數取先出現的） */
+export const topLetters = (s: string, n = 2): string[] => {
+  const m = new Map<string, number>();
+  for (const c of letters(s)) m.set(c, (m.get(c) ?? 0) + 1);
+  return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n).map(([c]) => c);
+};
+
+/** 已知例子表：上排原文字母、下排加密後的樣子 */
+export const exampleTable = (s: string, enc: (c: string) => Cell): HintBlock => {
+  const ex = topLetters(s);
+  return { k: 'table', rows: [['原文', ...ex], ['密文', ...ex.map(enc)]] };
+};
+
+/** 字母編號表（A=0……Z=25），給需要計算的密碼使用 */
+export const numberTable = (): HintBlock => ({
+  k: 'table',
+  rows: [[...A.slice(0, 13)], [...Array(13).keys()], [...A.slice(13)], [...Array(13).keys()].map((i) => i + 13)],
+});
+
+/** 空白 5×5 方陣（附行列編號），讓學生自己填字母 */
+export const blankGrid = (): HintBlock => gridTable(' '.repeat(25));

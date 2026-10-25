@@ -1,5 +1,5 @@
 import type { Cipher, Params } from './types';
-import { A, alphaTable, subst, unsubst } from './util';
+import { A, alphaTable, exampleTable, levels, para, subst, unsubst } from './util';
 
 const ROWS = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
 const QWE = 'QWERTYUIOPASDFGHJKLZXCVBNM';
@@ -16,10 +16,14 @@ export const keyboard: Cipher = {
     const to = table(p);
     return {
       text: subst(s, to),
-      hint: [
-        { k: 'p', text: p.m === 'q' ? '把鍵盤由左到右、由上到下的字母，依序對應 A、B、C……：' : '對照你的鍵盤，每個字母都換成它右邊的鍵（行尾回到行首）：' },
-        alphaTable(to),
-      ],
+      hint: levels([
+        [para('這個密碼和電腦鍵盤有關，準備一個鍵盤（或鍵盤的圖）來對照。')],
+        [para('已經有人破解了這兩個字母：'), exampleTable(s, (c) => to[A.indexOf(c)]), para('在鍵盤上找找這幾個鍵，它們的位置有什麼關係？')],
+        [para(p.m === 'q'
+          ? '鍵盤字母由左到右、由上到下是 Q W E R T Y……，依序代表 A B C D E F……。'
+          : '每個字母都換成鍵盤上它右邊的那個鍵；一排最右邊的鍵回到同一排最左邊（P→Q、L→A、M→Z）。解密時往左找。')],
+        [para('完整對照表：上排原文、下排密文。'), alphaTable(to)],
+      ]),
     };
   },
   decrypt: (c, p) => unsubst(c, table(p)),

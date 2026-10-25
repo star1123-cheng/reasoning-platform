@@ -4,7 +4,7 @@
 
 ## 位置與備份
 - 專案只放在本機 `C:\Users\user\Projects\Reasoning-Platform`，不要放回 Google 雲端硬碟：G: 槽是虛擬磁碟，`npm install` 會失敗（EPERM／EBADF），也不支援 junction 與 symlink。
-- 備份用 GitHub 私人儲存庫 `star1123-cheng/reasoning-platform`（分支 `main`）。提交前先執行 `git status` 給使用者確認。
+- GitHub 公開儲存庫 `star1123-cheng/reasoning-platform`（分支 `main`）；推送後由 `.github/workflows/deploy.yml` 自動部署到 https://star1123-cheng.github.io/reasoning-platform/ 。提交前先執行 `git status` 給使用者確認。
 
 ## 指令
 - `npm run dev`（預覽設定在 `.claude/launch.json`，名稱 `dev`，port 5173）
@@ -23,5 +23,5 @@
 
 ## 待辦
 - 實際開啟列印預覽，確認四份密室文件換頁與「附答案」行為。
-- 決定部署方式（GitHub Pages 需公開儲存庫；Netlify 可維持私人）。
+- 分層提示卡已套用到 27 種密碼；尚未做「提示程度」選單與規格書更新，見 `docs/hint-levels.md`。
 - 雲端硬碟舊資料夾由使用者自行刪除或改名。

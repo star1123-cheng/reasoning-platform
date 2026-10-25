@@ -95,6 +95,11 @@ button:disabled { opacity: .55; cursor: default; }
 .lg span { display: flex; flex-direction: column; align-items: center; font: 12px ui-monospace, monospace; min-width: 22px; }
 .hp { margin: 4px 0; }
 .book { font-size: 14px; }
+.pgrid { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0; }
+.hl { display: grid; gap: 8px; margin-top: 6px; }
+.hl-card { border: 1.5px dashed var(--line); border-radius: 6px; padding: 8px 10px; }
+.hl-card.shut { display: none; }
+.hl-no { display: block; font-size: 13px; color: var(--acc); }
 .case-t { font: 700 20px/1.3 "Noto Serif TC", Georgia, serif; margin: 6px 0 0; }
 details summary { cursor: pointer; color: var(--acc); font-size: 14px; }
 
@@ -173,5 +178,7 @@ button.danger { color: var(--red); border-color: var(--red); }
   .doc:first-child { break-before: auto; }
   .doc.off { display: none; }
   .clue-card { break-inside: avoid; border: 1px solid #999 !important; }
+  .hl-card.shut { display: block; }
+  .hl-card { break-inside: avoid; border-color: #999; }
   .dots i { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }

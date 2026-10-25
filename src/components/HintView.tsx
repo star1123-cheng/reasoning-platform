@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import type { CipherResult, Glyph, HintBlock } from '../ciphers';
 import { manShape, pigShape } from '../ciphers/glyphs';
 
@@ -27,6 +27,50 @@ export function TableView({ rows }: { rows: (string | number)[][] }) {
   );
 }
 
+/** 空白共濟會格子：井字格、有點井字格、X 字格、有點 X 字格 */
+function PigGrid() {
+  const z = 66, c = [11, 33, 55];
+  const xDots = [[33, 14], [14, 33], [52, 33], [33, 52]];
+  return (
+    <div className="pgrid" role="img" aria-label="兩個井字格與兩個 X 字格，第二個井字格與第二個 X 字格的每一格都有一個點">
+      {[false, true].map((dot) => (
+        <svg key={'h' + dot} viewBox={`-4 -4 ${z + 8} ${z + 8}`} width={z + 8} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true">
+          <path d={`M22 0V${z}M44 0V${z}M0 22H${z}M0 44H${z}`} />
+          {dot && c.flatMap((y) => c.map((x) => <circle key={`${x},${y}`} cx={x} cy={y} r={2} fill="currentColor" stroke="none" />))}
+        </svg>
+      ))}
+      {[false, true].map((dot) => (
+        <svg key={'x' + dot} viewBox={`-4 -4 ${z + 8} ${z + 8}`} width={z + 8} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true">
+          <path d={`M0 0L${z} ${z}M${z} 0L0 ${z}`} />
+          {dot && xDots.map(([x, y]) => <circle key={`${x},${y}`} cx={x} cy={y} r={2} fill="currentColor" stroke="none" />)}
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+/** 分層提示卡：畫面上逐張翻開，列印時全部印出（虛線框方便剪開） */
+function HintLevels({ cards }: { cards: HintBlock[][] }) {
+  const [open, setOpen] = useState(0);
+  return (
+    <div className="hl">
+      {cards.map((blocks, i) => (
+        <div key={i} className={`hl-card${i < open ? '' : ' shut'}`}>
+          <b className="hl-no">提示卡 {i + 1}{i === cards.length - 1 ? '（最後一張）' : ''}</b>
+          <HintView blocks={blocks} />
+        </div>
+      ))}
+      <div className="row np">
+        {open < cards.length
+          ? <button type="button" className="b g" onClick={() => setOpen(open + 1)}>翻開提示卡 {open + 1}</button>
+          : null}
+        {open > 0 && <button type="button" className="b g" onClick={() => setOpen(0)}>全部蓋回去</button>}
+        <span className="mut">已翻開 {open} / {cards.length} 張</span>
+      </div>
+    </div>
+  );
+}
+
 export function HintBlockView({ b }: { b: HintBlock }) {
   switch (b.k) {
     case 'p':
@@ -50,6 +94,11 @@ export function HintBlockView({ b }: { b: HintBlock }) {
           {b.words.map((w, i) => <Fragment key={i}><b>{i + 1}</b> {w}{'　'}</Fragment>)}
         </p>
       );
+    case 'pigGrid':
+      return <PigGrid />;
+    case 'levels':
+      // 謎題換了就重新蓋回所有提示卡
+      return <HintLevels key={JSON.stringify(b.cards)} cards={b.cards} />;
   }
 }
 

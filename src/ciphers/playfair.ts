@@ -1,5 +1,5 @@
 import type { Cipher } from './types';
-import { cl, letters, rows5, square } from './util';
+import { cl, levels, letters, para, rows5, square } from './util';
 
 /** 兩兩分組：同字或結尾補 X；若該字母本身是 X 則補 Q */
 export const digraphs = (s: string): [string, string][] => {
@@ -30,10 +30,11 @@ export const playfair: Cipher = {
     const g = square(p.key), d = digraphs(letters(s));
     return {
       text: d.map(([a, b]) => pf(g, a, b, 1)).join(' '),
-      hint: [
-        { k: 'p', text: '兩兩一組查方陣：同一列→各取右邊一格（行尾回到行首）；同一行→各取下面一格；否則各取同列、對方所在行的字母。解密方向相反（左、上）。I/J 同格；解出後拿掉夾在相同字母之間或結尾的 X（XX 之間用 Q）。' },
-        { k: 'table', rows: rows5(g) },
-      ],
+      hint: levels([
+        [para('密文兩個字母一組，一組一組解。每組的兩個字母，都要在方陣裡找出位置，看它們的位置關係。')],
+        [para(`已經有人破解了第一組：密文「${pf(g, d[0][0], d[0][1], 1)}」原本是「${d[0].join('')}」。在方陣裡圈出這四個字母，看看它們的位置。`)],
+        [para('解密規則：兩字在同一列→各取左邊一格（最左邊回到最右邊）；在同一行→各取上面一格；都不同→各取「自己這一列、對方那一行」的字母（四個字母剛好是長方形的四個角）。I/J 同格；解出後拿掉夾在相同字母之間或結尾的 X（XX 之間用 Q）。')],
+      ], [para('方陣（解題材料）：'), { k: 'table', rows: rows5(g) }]),
       note: '關鍵字 ' + cl(p.key) + '；明文分組：' + d.map((x) => x.join('')).join(' '),
     };
   },
