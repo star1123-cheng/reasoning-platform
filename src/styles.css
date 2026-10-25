@@ -99,8 +99,37 @@ button:disabled { opacity: .55; cursor: default; }
 details summary { cursor: pointer; color: var(--acc); font-size: 14px; }
 
 /* ── 密室逃脫 ── */
-.seg { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.stage { border-left: 4px solid var(--acc); }
+/* 製作步驟：設計 → 試玩 → 列印 */
+.steps { margin-bottom: 12px; }
+.steps ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.steps ol button { font: inherit; width: 100%; height: 100%; display: flex; gap: 8px; align-items: center; text-align: left; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--ink); cursor: pointer; }
+.steps ol button b { display: block; font-size: 15px; }
+.steps ol button small { display: block; font-size: 12px; color: var(--mut); line-height: 1.4; }
+.steps ol button[aria-current="step"] { border-color: var(--acc); box-shadow: inset 0 -3px 0 var(--acc); }
+.step-no { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; border: 1.5px solid var(--acc); color: var(--acc); }
+[aria-current="step"] .step-no { background: var(--acc); color: var(--card); }
+.steps-aside { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 14px; }
+@media (max-width: 520px) { .steps ol button small { display: none; } .steps ol button { flex-direction: column; text-align: center; gap: 4px; } }
+.next-step { justify-content: flex-end; margin: 4px 0 12px; }
+.fix-list { padding-left: 1.2em; }
+.fix-list li { margin-bottom: 6px; }
+.fix-list button { margin-left: 8px; }
+.backup summary { font-size: 15px; }
+.stage-list { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 6px; }
+.stage-list > li { border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.stage-list > li.open { border-color: var(--acc); border-left-width: 4px; }
+.stage-row { font: inherit; width: 100%; display: flex; gap: 10px; align-items: center; padding: 8px 10px; background: none; border: 0; color: var(--ink); cursor: pointer; text-align: left; }
+.stage-no { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--acc); color: var(--card); }
+.stage-sum { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.stage-sum .mut { overflow-wrap: anywhere; }
+.stage-st { flex: none; font-size: 13px; font-weight: 700; }
+.stage-st.ok { color: var(--acc); }
+.stage-st.bad { color: var(--red); }
+.stage-caret { flex: none; font-size: 13px; color: var(--acc); }
+.stage-body { padding: 0 12px 12px; border-top: 1px dashed var(--line); }
+.stage-tools { justify-content: flex-end; }
+.fixed { margin: 0; padding: 8px 0; }
+button.danger { color: var(--red); border-color: var(--red); }
 .stage-h { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between; }
 .stage-h h3 { margin: 0; font-size: 16px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }

@@ -21,6 +21,22 @@ function FieldInput({ f, value, onChange, id }: { f: FieldDef; value: string; on
   );
 }
 
+/** 收合時的一行摘要：第幾關、謎題、鎖、答案與是否正確 */
+function StageSummary({ s, i, err, open, onToggle }: { s: Stage; i: number; err: string | null; open: boolean; onToggle: () => void }) {
+  const def = puzzleOf(s.kind);
+  return (
+    <button type="button" className="stage-row" aria-expanded={open} aria-controls={`st${i}-body`} onClick={onToggle}>
+      <span className="stage-no">{i + 1}</span>
+      <span className="stage-sum">
+        <b>{def.name}</b>
+        <span className="mut">{LOCKS[s.lock].name}・答案 {s.answer || '（未填）'}</span>
+      </span>
+      <span className={err ? 'stage-st bad' : 'stage-st ok'}>{err ? '要修正' : '✓'}</span>
+      <span className="stage-caret" aria-hidden="true">{open ? '收合 ▲' : '編輯 ▼'}</span>
+    </button>
+  );
+}
+
 function StageEditor({ s, i, n, onChange, onMove, onRemove }: {
   s: Stage; i: number; n: number;
   onChange: (s: Stage) => void; onMove: (d: -1 | 1) => void; onRemove: () => void;
@@ -29,33 +45,27 @@ function StageEditor({ s, i, n, onChange, onMove, onRemove }: {
   const setKind = (k: PuzzleKind) => onChange({ ...newStage(k, s.scene) });
   const setLock = (lock: Stage['lock']) => onChange({ ...s, lock, answer: def.sample[lock] ?? '' });
   return (
-    <div className="box stage">
-      <div className="stage-h">
-        <h3>第 {i + 1} 關</h3>
-        <div className="row" style={{ marginTop: 0 }}>
-          <button type="button" className="b g sm" onClick={() => onMove(-1)} disabled={i === 0} aria-label={`第 ${i + 1} 關上移`}>上移</button>
-          <button type="button" className="b g sm" onClick={() => onMove(1)} disabled={i === n - 1} aria-label={`第 ${i + 1} 關下移`}>下移</button>
-          <button type="button" className="b g sm" onClick={onRemove} disabled={n === 1} aria-label={`刪除第 ${i + 1} 關`}>刪除</button>
-        </div>
-      </div>
-      <label htmlFor={`${id}-scene`}>場景敘述（印在線索卡最上方）</label>
-      <textarea id={`${id}-scene`} rows={2} maxLength={300} value={s.scene} onChange={(e) => onChange({ ...s, scene: e.target.value })} />
+    <div className="stage-body" id={`${id}-body`}>
       <div className="grid2">
         <div>
-          <label htmlFor={`${id}-kind`}>謎題類型</label>
+          <label htmlFor={`${id}-kind`}>① 謎題類型</label>
           <select id={`${id}-kind`} value={s.kind} onChange={(e) => setKind(e.target.value as PuzzleKind)}>
             {PUZZLES.map((p) => <option key={p.kind} value={p.kind}>{'★'.repeat(p.stars)} {p.name}</option>)}
           </select>
         </div>
         <div>
-          <label htmlFor={`${id}-lock`}>鎖</label>
-          <select id={`${id}-lock`} value={s.lock} onChange={(e) => setLock(e.target.value as Stage['lock'])}>
-            {def.locks.map((l) => <option key={l} value={l}>{LOCKS[l].name}</option>)}
-          </select>
+          <label htmlFor={`${id}-lock`}>② 鎖</label>
+          {def.locks.length > 1 ? (
+            <select id={`${id}-lock`} value={s.lock} onChange={(e) => setLock(e.target.value as Stage['lock'])}>
+              {def.locks.map((l) => <option key={l} value={l}>{LOCKS[l].name}</option>)}
+            </select>
+          ) : (
+            <p className="fixed" id={`${id}-lock`}>{LOCKS[s.lock].name}<span className="mut">（這種謎題只能用這種鎖）</span></p>
+          )}
         </div>
       </div>
       <p className="mut" style={{ margin: '4px 0 0' }}>{def.desc}</p>
-      <label htmlFor={`${id}-ans`}>答案（{LOCKS[s.lock].rule}）</label>
+      <label htmlFor={`${id}-ans`}>③ 答案（{LOCKS[s.lock].rule}）</label>
       <input id={`${id}-ans`} value={s.answer} maxLength={40} aria-invalid={!!err} aria-describedby={err ? `${id}-err` : undefined} onChange={(e) => onChange({ ...s, answer: e.target.value })} />
       {s.lock === 'dir' && (
         <div className="row" style={{ marginTop: 6 }}>
@@ -69,17 +79,36 @@ function StageEditor({ s, i, n, onChange, onMove, onRemove }: {
       {def.fields.map((f) => (
         <FieldInput key={f.k} f={f} id={`${id}-${f.k}`} value={s.fields[f.k] ?? f.v} onChange={(v) => onChange({ ...s, fields: { ...s.fields, [f.k]: v } })} />
       ))}
+      <label htmlFor={`${id}-scene`}>④ 場景敘述（印在線索卡最上方，可留空）</label>
+      <textarea id={`${id}-scene`} rows={2} maxLength={300} value={s.scene} onChange={(e) => onChange({ ...s, scene: e.target.value })} />
+      <div className="row stage-tools">
+        <button type="button" className="b g sm" onClick={() => onMove(-1)} disabled={i === 0} aria-label={`第 ${i + 1} 關往前移`}>往前移</button>
+        <button type="button" className="b g sm" onClick={() => onMove(1)} disabled={i === n - 1} aria-label={`第 ${i + 1} 關往後移`}>往後移</button>
+        <button type="button" className="b g sm danger" onClick={onRemove} disabled={n === 1} aria-label={`刪除第 ${i + 1} 關`}>刪除這關</button>
+      </div>
     </div>
   );
 }
 
-export function RoomEditor({ room, onChange }: { room: Room; onChange: (r: Room) => void }) {
+export function RoomEditor({ room, onChange, open, setOpen }: {
+  room: Room; onChange: (r: Room) => void; open: number; setOpen: (i: number) => void;
+}) {
   const set = (p: Partial<Room>) => onChange({ ...room, ...p });
   const setStage = (i: number, s: Stage) => set({ stages: room.stages.map((x, j) => (j === i ? s : x)) });
   const move = (i: number, d: -1 | 1) => {
     const st = [...room.stages];
     [st[i], st[i + d]] = [st[i + d], st[i]];
     set({ stages: st });
+    setOpen(i + d);
+  };
+  const remove = (i: number) => {
+    if (!window.confirm(`確定要刪除第 ${i + 1} 關嗎？`)) return;
+    set({ stages: room.stages.filter((_, j) => j !== i) });
+    setOpen(-1);
+  };
+  const add = () => {
+    set({ stages: [...room.stages, newStage('quiz')] });
+    setOpen(room.stages.length);
   };
   return (
     <>
@@ -103,14 +132,25 @@ export function RoomEditor({ room, onChange }: { room: Room; onChange: (r: Room)
           </div>
         </div>
       </div>
-      {room.stages.map((s, i) => (
-        <StageEditor key={i} s={s} i={i} n={room.stages.length}
-          onChange={(x) => setStage(i, x)} onMove={(d) => move(i, d)}
-          onRemove={() => set({ stages: room.stages.filter((_, j) => j !== i) })} />
-      ))}
-      <button type="button" className="b" disabled={room.stages.length >= MAX_STAGES} onClick={() => set({ stages: [...room.stages, newStage('quiz')] })}>
-        新增關卡（{room.stages.length}/{MAX_STAGES}）
-      </button>
+
+      <div className="box">
+        <span className="tag">關卡（{room.stages.length}/{MAX_STAGES}）</span>
+        <p className="mut" style={{ margin: '0 0 8px' }}>學生依序過關：每關的答案打開下一關的鎖。點一關展開編輯。</p>
+        <ol className="stage-list">
+          {room.stages.map((s, i) => (
+            <li key={i} className={open === i ? 'open' : ''}>
+              <StageSummary s={s} i={i} err={stageError(s)} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />
+              {open === i && (
+                <StageEditor s={s} i={i} n={room.stages.length}
+                  onChange={(x) => setStage(i, x)} onMove={(d) => move(i, d)} onRemove={() => remove(i)} />
+              )}
+            </li>
+          ))}
+        </ol>
+        <button type="button" className="b g" disabled={room.stages.length >= MAX_STAGES} onClick={add}>
+          ＋ 新增一關
+        </button>
+      </div>
     </>
   );
 }
