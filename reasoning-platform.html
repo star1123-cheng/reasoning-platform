@@ -1,0 +1,163 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>推理工坊・密碼謎題產生器</title>
+<style>
+:root{color-scheme:light dark;--bg:#e8eef0;--card:#f7fafb;--ink:#14232b;--mut:#4f6770;--acc:#0d6a6a;--tag:#f0cf4e;--line:#c3d1d6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a1f;--card:#17262d;--ink:#e6eef0;--mut:#8ea7b0;--acc:#4fc3bd;--tag:#e6c447;--line:#2b414a}}
+:root[data-theme="dark"]{--bg:#0f1a1f;--card:#17262d;--ink:#e6eef0;--mut:#8ea7b0;--acc:#4fc3bd;--tag:#e6c447;--line:#2b414a}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif}
+.w{max-width:760px;margin:0 auto;padding:16px}
+h1{font:700 24px/1.2 "Noto Serif TC",Georgia,"Songti TC",serif;margin:8px 0 2px}
+.sub{color:var(--mut);margin:0 0 14px;font-size:14px}
+.tabs{display:flex;gap:6px;overflow-x:auto;border-bottom:2px solid var(--line);margin-bottom:14px}
+.tabs span{padding:8px 12px;white-space:nowrap;color:var(--mut);font-size:15px}
+.tabs .on{color:var(--ink);font-weight:700;border-bottom:3px solid var(--acc);margin-bottom:-2px}
+.tabs small{font-size:11px;background:var(--line);border-radius:8px;padding:1px 6px;margin-left:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.gh{width:100%;font-size:13px;color:var(--mut);margin-top:4px}.chip{font:inherit;font-size:14px;padding:6px 11px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--card)}
+.chip:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--tag);outline-offset:1px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:14px;color:var(--mut);margin:8px 0 3px}
+input,select,textarea{font:inherit;width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+input[type=checkbox]{width:auto}
+textarea{resize:vertical;min-height:44px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button.b{font:inherit;padding:8px 14px;border-radius:6px;border:1px solid var(--acc);background:var(--acc);color:var(--card);cursor:pointer}
+button.g{background:transparent;color:var(--acc)}
+.desc{color:var(--mut);font-size:14px;margin:0 0 4px}
+.tag{display:inline-block;background:var(--tag);color:#222;font-size:12px;font-weight:700;padding:1px 8px;border-radius:3px;margin-bottom:6px}
+#out,.pz{white-space:pre-wrap;font:600 20px/1.9 ui-monospace,"SF Mono",Menlo,Consolas,monospace;word-break:break-all;letter-spacing:.04em}
+#out,.pz{overflow-x:auto}#out svg{vertical-align:middle}.wd{display:inline-block;margin:0 14px 6px 0;white-space:nowrap}
+.sc{overflow-x:auto}.t{border-collapse:collapse;margin:4px 0}
+.t td{border:1px solid var(--line);padding:1px 5px;font:13px ui-monospace,Menlo,monospace;text-align:center;min-width:22px}
+.lg{display:flex;flex-wrap:wrap;gap:6px}.lg span{display:flex;flex-direction:column;align-items:center;font:12px ui-monospace,monospace}
+#note{font-size:14px;color:var(--mut)}
+:root{--red:#b3261e}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--red:#ff8f85}}:root[data-theme="dark"]{--red:#ff8f85}
+body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cg fill='%23808080' fill-opacity='.09'%3E%3Cellipse cx='30' cy='28' rx='5' ry='8' transform='rotate(20 30 28)'/%3E%3Cellipse cx='35' cy='45' rx='4' ry='4'/%3E%3Cellipse cx='100' cy='98' rx='5' ry='8' transform='rotate(-160 100 98)'/%3E%3Cellipse cx='96' cy='80' rx='4' ry='4'/%3E%3C/g%3E%3C/svg%3E")}
+.ic{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.hd{display:flex;align-items:center;gap:12px}.hd>.ic{width:46px;height:46px;color:var(--acc);flex:none}.hd .sub{margin:0}.deco{margin-left:auto;display:flex;gap:8px;color:var(--mut)}.deco .ic{width:42px;height:28px}
+.trail{display:flex;margin:6px 0 8px;height:36px}.trail .ic{width:15px;height:26px;fill:var(--line);stroke:none;margin-right:14px}.trail .ic:nth-child(even){transform:translateY(9px) scaleX(-1)}
+.tabs button{font:inherit;background:none;border:0;border-bottom:3px solid transparent;padding:8px 12px;color:var(--mut);cursor:pointer;display:flex;gap:6px;align-items:center;white-space:nowrap;margin-bottom:-2px}.tabs button[aria-selected="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--acc)}.tabs button:disabled{opacity:.55;cursor:default}.tabs .ic{width:18px;height:18px}
+.tag{position:relative;padding:2px 10px 2px 22px;border-radius:2px 9px 9px 2px}.tag::before{content:"";position:absolute;left:7px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:var(--card);box-shadow:inset 0 0 0 1px #0005}
+.stamp{float:right;font:700 12px ui-monospace,Menlo,monospace;color:var(--red);border:2px solid var(--red);padding:1px 8px;border-radius:3px;transform:rotate(-4deg)}
+.note{border-style:dashed}.chip small{display:block;font-size:11px;opacity:.8}.chip:disabled{opacity:.6;cursor:default;border-style:dashed}
+.pz{font:600 20px/1.9 ui-monospace,Menlo,monospace;margin:8px 0}#cv h2{font:700 20px/1.3 "Noto Serif TC",Georgia,serif;margin:6px 0 0}#cv summary{cursor:pointer;color:var(--acc);font-size:14px}
+button:disabled{opacity:.55;cursor:default}
+@media print{.np{display:none!important}body{background:#fff;color:#000}.box{border:0}#out,.pz{overflow:visible}.nb{display:none}body.pa .nb{display:block}}
+</style></head><body><div class="w">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-lens" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5"/><path d="M15 15L21.5 21.5M7 8.5a4 4 0 0 1 3-2"/></symbol>
+<symbol id="i-foot" viewBox="0 0 16 26"><ellipse cx="8" cy="8" rx="5" ry="7.5"/><ellipse cx="8" cy="21.5" rx="3.6" ry="4"/></symbol>
+<symbol id="i-glass" viewBox="0 0 32 16"><circle cx="8" cy="9" r="5.5"/><circle cx="24" cy="9" r="5.5"/><path d="M13.5 8.5Q16 6 18.5 8.5M2.5 8L1 4M29.5 8L31 4"/></symbol>
+<symbol id="i-cigar" viewBox="0 0 32 24"><rect x="3" y="14" width="22" height="5" rx="2.5"/><path d="M25 16.5h3M9 14v5M7 10c-2-2 2-3 0-6M12 10c-2-2 2-3 0-6"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="7" cy="12" r="4"/><path d="M11 12h10M17 12v4M21 12v3"/></symbol>
+<symbol id="i-door" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="1"/><circle cx="15" cy="12" r=".8"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M5 8h5l2 2h7v9H5zM5 8V5h5l2 2"/></symbol>
+</defs></svg>
+<header class="hd np"><svg class="ic" aria-hidden="true"><use href="#i-lens"/></svg><div><h1>推理工坊</h1><p class="sub">輸入答案，產生可以直接出題的謎題。</p></div><div class="deco" aria-hidden="true"><svg class="ic"><use href="#i-glass"/></svg><svg class="ic"><use href="#i-cigar"/></svg></div></header>
+<div class="trail np" aria-hidden="true"><svg class="ic"><use href="#i-foot"/></svg><svg class="ic"><use href="#i-foot"/></svg><svg class="ic"><use href="#i-foot"/></svg><svg class="ic"><use href="#i-foot"/></svg><svg class="ic"><use href="#i-foot"/></svg><svg class="ic"><use href="#i-foot"/></svg><svg class="ic"><use href="#i-foot"/></svg><svg class="ic"><use href="#i-foot"/></svg></div>
+<div class="tabs np" role="tablist"><button role="tab" id="tc" data-t="c" aria-controls="pc" aria-selected="true"><svg class="ic" aria-hidden="true"><use href="#i-key"/></svg>密碼</button><button role="tab" id="th" data-t="h" aria-controls="pch" aria-selected="false" tabindex="-1"><svg class="ic" aria-hidden="true"><use href="#i-file"/></svg>精選挑戰</button><button role="tab" disabled aria-selected="false" tabindex="-1"><svg class="ic" aria-hidden="true"><use href="#i-door"/></svg>密室逃脫<small>製作中</small></button></div>
+<div id="pc" role="tabpanel" aria-labelledby="tc"><div class="chips np" id="chips"></div>
+<div class="box np"><p class="desc" id="desc"></p>
+<label for="ans">答案（英文字母，可含空格）</label><textarea id="ans" rows="2">THE KEY IS UNDER THE DESK</textarea>
+<div id="ps"></div>
+<div class="row"><button class="b" id="go">重新產生</button><button class="b g" id="cp">複製謎題</button><button class="b g" id="pr">列印學習單</button><label style="margin:8px 0 0;display:flex;gap:6px;align-items:center"><input type="checkbox" id="pa">列印時附答案</label></div></div>
+<div class="box"><span class="stamp">證物 No.<span id="no"></span></span><span class="tag">謎題</span><div id="out"></div></div>
+<div class="box note"><span class="tag">解碼提示（發給學生）</span><div class="sc" id="hint"></div></div>
+<div class="box nb"><span class="tag">出題者備註</span><div id="note"></div></div>
+</div>
+<div id="pch" role="tabpanel" aria-labelledby="th" hidden><p class="desc">依經典推理小說的情節改寫（白話摘要，非原文）。讀完線索，輸入你的推論。</p><div class="chips" id="cases"></div><div class="box" id="cv"></div></div>
+</div>
+<script>
+const A='ABCDEFGHIJKLMNOPQRSTUVWXYZ',$=s=>document.querySelector(s),esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const L=(s,f)=>s.replace(/[a-z]/gi,c=>f(A.indexOf(c.toUpperCase())));
+const W=(s,f)=>s.toUpperCase().split(/\s+/).map(w=>w.replace(/[^A-Z]/g,'')).filter(Boolean).map(f);
+const tbl=r=>'<table class="t">'+r.map(x=>'<tr>'+x.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</table>';
+const alpha=to=>{to=[...to];return tbl([[...A.slice(0,13)],to.slice(0,13),[...A.slice(13)],to.slice(13)])};
+const rnd=n=>Math.random()*n|0;
+const lg=f=>'<div class="lg">'+[...A].map((c,i)=>'<span>'+f(i)+c+'</span>').join('')+'</div>';
+const sv=(w,h,b)=>`<svg viewBox="0 0 ${w} ${h}" width="${w*1.3}" height="${h*1.3}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${b}</svg>`;
+const pig=i=>{let d='',dot,x,y;if(i<18){const c=i%9,r=c/3|0,k=c%3;dot=i>=9;x=12;y=12;if(k>0)d+='M4 4V20';if(k<2)d+='M20 4V20';if(r>0)d+='M4 4H20';if(r<2)d+='M4 20H20'}else{const j=i-18,s=j%4;dot=j>=4;d=['M4 4L12 12L20 4','M4 4L12 12L4 20','M20 4L12 12L20 20','M4 20L12 12L20 20'][s];[x,y]=[[12,7],[7,12],[17,12],[12,17]][s]}return sv(24,24,`<path d="${d}"/>`+(dot?`<circle cx="${x}" cy="${y}" r="1.6" fill="currentColor"/>`:''))};
+const man=(i,fl)=>{const c=(i*7+3)%54,la=[[6,6],[5,12],[7,19]][c%3],ra=[[22,6],[23,12],[21,19]][(c/3|0)%3],ll=[[8,29],[5,25],[11,30]][(c/9|0)%3],rl=[[20,29],[23,25],[17,30]][c/27|0];
+return sv(28,32,`<circle cx="14" cy="6" r="3" fill="currentColor"/><path d="M14 9V21M14 12L${la}M14 12L${ra}M14 21L${ll}M14 21L${rl}${fl?`M${ra[0]} ${ra[1]}v-6h5v4h-5`:''}"/>`)};
+const M='.- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --..'.split(' ');
+const GB='5 2 - † 8 1 3 4 6 ¶ ( 0 9 * ‡ . ¿ ) ; ? ¢ ] [ ‖ : §'.split(' ');
+const KR=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'],QW='QWERTYUIOPASDFGHJKLZXCVBNM';
+const P5=A.replace('J','');
+const BOOK='A brave clerk discovered eleven faded green hats in Jasper\'s kitchen. Late at midnight nobody opened parcels; quiet rain slowly tapped upon velvet windows. Xavier yawned, zipped his old coat, and quickly read every hidden note. The keen inspector smiled, knowing just where Daniel kept the missing umbrella. Young Zoe gathered five black ink bottles, visited Oxford, and wrote xenial letters to Robert.';
+const KP=['ABC','DEF','GHI','JKL','MNO','PQRS','TUV','WXYZ'],PT=A.replace('K',''),BK='Apple Bird Cat Door Egg Fish Gold Hat Ink Jar Key Lamp Moon Nest Owl Pen Queen Rain Star Tree Umbrella Voice Wolf Xray Yarn Zoo'.split(' '),G6='NA1C3H8TB2OME5WRPD4F6G7I9J0KLQSUVXYZ',AD='ADFGVX';
+const cl=k=>(k||'').toUpperCase().replace(/[^A-Z]/g,''),sq=k=>[...new Set((cl(k)+A).replace(/J/g,'I'))].join(''),sg=g=>[0,1,2,3,4].map(r=>[...g.slice(r*5,r*5+5)]),pg=g=>tbl([['',1,2,3,4,5],...sg(g).map((r,i)=>[i+1,...r])]);
+const ba=c=>A.indexOf(c).toString(2).padStart(5,'0').replace(/0/g,'A').replace(/1/g,'B'),ct=f=>'<div class="lg">'+[...A].map((c,i)=>`<span>${c}<br>${f(c,i)}</span>`).join('')+'</div>';
+const col=(t,k)=>{const n=k.length,o=[...k].map((c,i)=>[c,i]).sort((a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:a[1]-b[1]);let r='';for(const[,i]of o)for(let j=i;j<t.length;j+=n)r+=t[j];return r};
+const dg=t=>{t=t.replace(/J/g,'I');const r=[];for(let i=0;i<t.length;){const a=t[i],b=t[i+1];if(!b||a==b){r.push([a,a=='X'?'Q':'X']);i++}else{r.push([a,b]);i+=2}}return r};
+const pf=(g,a,b)=>{const x=g.indexOf(a),y=g.indexOf(b),r1=x/5|0,c1=x%5,r2=y/5|0,c2=y%5;return r1==r2?g[r1*5+(c1+1)%5]+g[r2*5+(c2+1)%5]:c1==c2?g[((r1+1)%5)*5+c1]+g[((r2+1)%5)*5+c2]:g[r1*5+c2]+g[r2*5+c1]};
+const rail=(s,n)=>{const t=W(s,x=>x).join(''),rows=Array.from({length:n},()=>[]);let r=0,d=1;[...t].forEach((c,i)=>{rows[r].push([i,c]);if(r==0)d=1;else if(r==n-1)d=-1;r+=d});return{t,rows}};
+const C=[
+{n:'凱撒密碼',lv:1,d:'每個字母往後平移固定位數。',p:[{k:'n',l:'位移數',t:'number',v:3}],run:(s,p)=>{const n=(((+p.n||0)%26)+26)%26,m=i=>A[(i+n)%26];return{t:L(s,m),h:'每個字母都被換成對照表下方的字母：'+alpha([...A].map((_,i)=>m(i))),a:'位移 '+n}}},
+{n:'阿特巴希密碼',lv:1,d:'字母表倒過來對應：A↔Z、B↔Y……',p:[],run:s=>({t:L(s,i=>A[25-i]),h:'上排與下排的字母互換：'+alpha([...A].reverse())})},
+{n:'維吉尼亞密碼',lv:3,d:'用一組金鑰字母，逐字決定平移多少。',p:[{k:'key',l:'金鑰（英文字母）',t:'text',v:'KEY'}],run:(s,p)=>{const k=(p.key||'KEY').toUpperCase().replace(/[^A-Z]/g,'')||'KEY';let j=0;return{t:s.replace(/[a-z]/gi,c=>A[(A.indexOf(c.toUpperCase())+A.indexOf(k[j++%k.length]))%26]),h:'金鑰字母依序重複使用；A=0、B=1、C=2……，每個密文字母要往回退金鑰字母對應的格數。',a:'金鑰 '+k}}},
+{n:'波利比奧斯方陣',lv:2,d:'每個字母變成「行＋列」兩位數字。',p:[],run:s=>({t:W(s,w=>[...w].map(c=>{const i=P5.indexOf(c=='J'?'I':c);return(i/5|0)+1+''+(i%5+1)}).join(' ')).join('  /  '),h:'前一個數字是行、後一個是列，I 與 J 共用一格；「/」代表單字分隔。'+tbl([['',1,2,3,4,5],...[0,1,2,3,4].map(r=>[r+1,...[...P5.slice(r*5,r*5+5)]])])})},
+{n:'柵欄密碼',lv:2,d:'字母以上下斜線排進幾排，再逐排讀出。',p:[{k:'n',l:'排數',t:'number',v:3}],run:(s,p)=>{const n=Math.min(6,Math.max(2,+p.n||3)),{t,rows}=rail(s,n),g=rows.map((r,y)=>Array.from({length:t.length},(_,x)=>r.some(e=>e[0]==x)?'□':''));return{t:rows.map(r=>r.map(e=>e[1]).join('')).join(''),h:`密文共 ${t.length} 個字母。依「上下上下」的斜線填入 ${n} 排（□ 是要填字母的格子，先填第一排再填第二排……），再沿著斜線讀回原句。`+tbl(g),a:n+' 排'}}},
+{n:'木棒密碼',lv:2,d:'把文字繞在木棒上，換個方向讀。',p:[{k:'c',l:'每圈字數（2–12）',t:'number',v:4}],run:(s,p)=>{const c=Math.min(12,Math.max(2,+p.c||4));let t=W(s,x=>x).join('');while(t.length%c)t+='X';const r=t.length/c;let o='';for(let k=0;k<c;k++)for(let j=0;j<r;j++)o+=t[j*c+k];return{t:o,h:`每 ${r} 個字母排成一直行，由上往下填滿一行後換下一行，最後橫著讀。結尾的 X 是補位字母。`,a:'每圈 '+c+' 字，補 X 至 '+t.length+' 字'}}},
+{n:'摩斯密碼',lv:1,d:'用長短訊號表示字母。',p:[],run:s=>({t:W(s,w=>[...w].map(c=>M[A.indexOf(c)]).join(' ')).join(' / '),h:'「.」是短音，「-」是長音，「/」是單字分隔。'+'<div class="lg">'+[...A].map((c,i)=>`<span>${c}<br>${M[i]}</span>`).join('')+'</div>'})},
+{n:'鍵盤密碼',lv:1,d:'把字母換成鍵盤上相鄰的鍵，或依鍵盤順序重新編號。',p:[{k:'m',l:'類型',t:'select',o:[['r','右移一格'],['q','QWE（依鍵盤順序）']],v:'r'}],run:(s,p)=>{const m=p.m=='q'?i=>QW[i]:i=>{const r=KR.find(x=>x.includes(A[i]));return r[(r.indexOf(A[i])+1)%r.length]};return{t:L(s,m),h:p.m=='q'?'把鍵盤由左到右、由上到下的字母，依序對應 A、B、C……：'+alpha(QW):'對照你的鍵盤，每個字母都換成它右邊的鍵（行尾回到行首）：'+alpha([...A].map((_,i)=>m(i)))}}},
+{n:'交錯干擾碼',lv:1,d:'每個字母後面藏一個多餘字母。',p:[],run:s=>({t:W(s,w=>[...w].map(c=>c+A[rnd(26)]).join('')).join(' '),h:'每個單字只看第 1、3、5……個字母，其餘都是干擾。'})},
+{n:'共濟會密碼',lv:2,d:'用格子與點構成的符號代換字母。',p:[],run:s=>({x:W(s,w=>'<span class="wd">'+[...w].map(c=>pig(A.indexOf(c))).join('')+'</span>').join(''),h:'對照符號表，找出每個符號代表的字母：'+lg(pig)})},
+{n:'跳舞小人',lv:2,d:'福爾摩斯《跳舞的人》，每個字母是一個姿勢。',p:[{k:'f',l:'單字結尾的小人手持旗子',t:'check',v:false}],run:(s,p)=>({x:W(s,w=>'<span class="wd">'+[...w].map((c,i)=>man(A.indexOf(c),p.f&&i==w.length-1)).join('')+'</span>').join(''),h:(p.f?'手持旗子的小人表示單字的結尾。':'')+'對照下表解讀每個小人：'+lg(i=>man(i,false)),a:p.f?'有旗子':'無旗子（適合中低年級）'})},
+{n:'黃金蟲密碼',lv:2,d:'愛倫坡《金甲蟲》式的符號代換。',p:[],run:s=>({t:W(s,w=>[...w].map(c=>GB[A.indexOf(c)]).join(' ')).join('    '),h:'每個符號對應一個字母，單字之間空比較寬：'+alpha(GB)})},
+{n:'比爾密碼（書本）',lv:3,d:'密文是數字，指向書中第幾個單字的第一個字母。',p:[{k:'b',l:'書本內容',t:'area',v:BOOK}],run:(s,p)=>{const bw=(p.b||'').split(/\s+/).map(x=>x.replace(/[^A-Za-z]/g,'')).filter(Boolean);let miss='';const t=W(s,w=>[...w].map(c=>{const ix=bw.map((x,i)=>x[0].toUpperCase()==c?i+1:0).filter(Boolean);if(!ix.length){miss+=c;return'?'}return ix[rnd(ix.length)]}).join(' ')).join(' / ');return{t,h:'每個數字代表下面書中的第幾個單字，取它的第一個字母：<p>'+bw.map((x,i)=>`<b>${i+1}</b> ${x}`).join('　')+'</p>',a:miss?'書中缺少這些字母，顯示為 ?：'+miss:'書中字母足夠'}}},
+{n:'數字密碼 A1Z26',lv:1,d:'A=1、B=2……Z=26。',p:[],run:s=>({t:W(s,w=>[...w].map(c=>A.indexOf(c)+1).join('-')).join('  /  '),h:'A=1、B=2、C=3……Z=26；「-」連接同一單字的字母，「/」是單字分隔。'})},
+{n:'手機九宮格',lv:1,d:'數字按幾次，就是該鍵上第幾個字母。',p:[],run:s=>({t:W(s,w=>[...w].map(c=>{const k=KP.findIndex(x=>x.includes(c));return String(k+2).repeat(KP[k].indexOf(c)+1)}).join(' ')).join(' / '),h:'數字重複幾次，就取該鍵上第幾個字母；空格分隔字母，「/」分隔單字。'+tbl(KP.map((x,i)=>[i+2,x]))})},
+{n:'藏頭密碼',lv:1,d:'每個詞的第一個字母才是答案。',p:[],run:s=>({t:W(s,w=>[...w].map(c=>BK[A.indexOf(c)]).join(' ')).join('\n'),h:'每一行是一個單字；只看每個詞的第一個字母，其餘是障眼法。'})},
+{n:'關鍵字代換',lv:2,d:'字母表以關鍵字開頭，其餘依序排列。',p:[{k:'key',l:'關鍵字',t:'text',v:'ZEBRAS'}],run:(s,p)=>{const k=[...new Set(cl(p.key)+A)].join('');return{t:L(s,i=>k[i]),h:'上排字母以下排字母代替：'+alpha(k),a:'關鍵字 '+cl(p.key)}}},
+{n:'敲擊密碼 Tap Code',lv:2,d:'用敲幾下表示方陣的行與列（囚犯敲牆傳訊）。',p:[],run:s=>({t:W(s,w=>[...w].map(c=>{const i=PT.indexOf(c=='K'?'C':c);return '•'.repeat((i/5|0)+1)+' '+'•'.repeat(i%5+1)}).join('   ')).join('  /  '),h:'每組兩串點：第一串是行、第二串是列，K 與 C 共用一格；「/」分隔單字。'+pg(PT)})},
+{n:'培根密碼',lv:2,d:'每個字母變成 5 個 A/B，可藏在大小寫裡。',p:[{k:'m',l:'呈現方式',t:'select',o:[['ab','A/B 字串'],['c','大小寫偽裝']],v:'ab'},{k:'c',l:'偽裝用文字（大小寫模式）',t:'text',v:'the quick brown fox jumps over the lazy dog'}],run:(s,p)=>{const b=W(s,w=>[...w].map(ba));let t;if(p.m=='c'){const cv=cl(p.c).toLowerCase()||'abcdefghij',q=b.flat().join('');t=[...q].map((x,i)=>x=='B'?cv[i%cv.length].toUpperCase():cv[i%cv.length]).join('')}else t=b.map(x=>x.join(' ')).join(' / ');return{t,h:(p.m=='c'?'大寫＝B、小寫＝A，每 5 個字母一組。':'每 5 個 A/B 是一個字母，「/」分隔單字。')+ct(ba),a:p.m=='c'?'偽裝文字不夠長時會重複使用':''}}},
+{n:'二進位 ASCII',lv:2,d:'每個字母是 8 個 0／1。',p:[],run:s=>({t:W(s,w=>[...w].map(c=>c.charCodeAt(0).toString(2).padStart(8,'0')).join(' ')).join('  /  '),h:'每 8 位是一個字母。由左到右的位值是 128、64、32、16、8、4、2、1，相加得到 ASCII 編號（A=65、B=66……）。'+tbl([[128,64,32,16,8,4,2,1]])})},
+{n:'仿射密碼',lv:3,d:'用公式 (a×字母編號＋b) 代換。',p:[{k:'a',l:'a（需與 26 互質）',t:'select',o:[1,3,5,7,9,11,15,17,19,21,23,25].map(x=>[x,x]),v:5},{k:'b',l:'b',t:'number',v:8}],run:(s,p)=>{const a=+p.a||5,b=(((+p.b||0)%26)+26)%26,m=i=>A[(a*i+b)%26];return{t:L(s,m),h:`加密公式：E(x)=(${a}x+${b}) mod 26，A=0、B=1……。可只給公式提高難度，或附對照表：`+alpha([...A].map((_,i)=>m(i))),a:`a=${a}，b=${b}`}}},
+{n:'博福特密碼',lv:3,d:'維吉尼亞的鏡像版：金鑰字母減明文字母。',p:[{k:'key',l:'金鑰（英文字母）',t:'text',v:'KEY'}],run:(s,p)=>{const k=cl(p.key)||'KEY';let j=0;return{t:s.replace(/[a-z]/gi,c=>A[(A.indexOf(k[j++%k.length])-A.indexOf(c.toUpperCase())+26)%26]),h:'A=0、B=1……；密文＝金鑰字母−明文字母（不足加 26）。解密用完全相同的算法。',a:'金鑰 '+k}}},
+{n:'欄位換位密碼',lv:3,d:'依金鑰字母順序，一欄一欄讀出。',p:[{k:'key',l:'金鑰（英文字母）',t:'text',v:'ZEBRA'}],run:(s,p)=>{const k=cl(p.key)||'ZEBRA';let t=W(s,x=>x).join('');while(t.length%k.length)t+='X';return{t:col(t,k),h:`金鑰：${k}。把密文依金鑰字母的字母順序（A→Z，相同字母由左到右）填進各欄，每欄 ${t.length/k.length} 個字母，再依金鑰原本由左到右逐列讀出。結尾的 X 是補位。`,a:'金鑰 '+k}}},
+{n:'Playfair 密碼',lv:4,d:'兩個字母一組，依方陣位置關係代換。',p:[{k:'key',l:'關鍵字',t:'text',v:'MONARCHY'}],run:(s,p)=>{const g=sq(p.key),d=dg(W(s,x=>x).join(''));return{t:d.map(x=>pf(g,...x)).join(' '),h:'兩兩一組查方陣：同一列→各取右邊一格（行尾回到行首）；同一行→各取下面一格；否則各取同列、對方所在行的字母。解密方向相反（左、上）。I/J 同格；解出後拿掉夾在相同字母之間或結尾的 X（XX 之間用 Q）。'+tbl(sg(g)),a:'關鍵字 '+cl(p.key)+'；明文分組：'+d.map(x=>x.join('')).join(' ')}}},
+{n:'四方密碼 Four-Square',lv:4,d:'兩個標準方陣加兩個關鍵字方陣。',p:[{k:'k1',l:'關鍵字一（右上）',t:'text',v:'EXAMPLE'},{k:'k2',l:'關鍵字二（左下）',t:'text',v:'KEYWORD'}],run:(s,p)=>{const g=sq(''),g1=sq(p.k1),g2=sq(p.k2),t=W(s,x=>x).join('').replace(/J/g,'I'),pr=(t.match(/.{1,2}/g)||[]).map(x=>x.padEnd(2,'X'));const top=sg(g).map((r,i)=>[...r,'',...sg(g1)[i]]),bot=sg(g2).map((r,i)=>[...r,'',...sg(g)[i]]);return{t:pr.map(([a,b])=>{const i=g.indexOf(a),j=g.indexOf(b);return g1[(i/5|0)*5+j%5]+g2[(j/5|0)*5+i%5]}).join(' '),h:'明文兩兩一組：第一字在左上、第二字在右下的標準方陣找位置；密文第一字取右上方陣「第一字的行、第二字的列」，第二字取左下方陣「第二字的行、第一字的列」。解密則反過來。'+tbl([...top,Array(11).fill(''),...bot]),a:`關鍵字 ${cl(p.k1)} / ${cl(p.k2)}；明文分組：${pr.join(' ')}`}}},
+{n:'Bifid 雙分密碼',lv:4,d:'先轉成方陣座標，再打散重組。',p:[{k:'key',l:'方陣關鍵字（可留空）',t:'text',v:''}],run:(s,p)=>{const g=sq(p.key),t=[...W(s,x=>x).join('').replace(/J/g,'I')],q=[...t.map(c=>(g.indexOf(c)/5|0)+1),...t.map(c=>g.indexOf(c)%5+1)];let o='';for(let i=0;i<q.length;i+=2)o+=g[(q[i]-1)*5+q[i+1]-1];return{t:o,h:'密文每個字母換成「行、列」兩個數字，全部排成一長串後切成前後兩半：前半是明文各字母的行號、後半是列號，依序配對即可讀出。'+pg(g),a:'方陣關鍵字 '+(cl(p.key)||'（無）')}}},
+{n:'ADFGVX 密碼',lv:5,d:'一戰德軍密碼：方陣代換後再欄位換位。',p:[{k:'key',l:'換位金鑰',t:'text',v:'CARGO'}],run:(s,p)=>{const k=cl(p.key)||'CARGO',m=[...W(s,x=>x).join('')].map(c=>{const i=G6.indexOf(c);return AD[i/6|0]+AD[i%6]}).join('');return{t:col(m,k).replace(/(.{5})/g,'$1 ').trim(),h:`先用方陣把每個字母換成兩個符號，再依金鑰「${k}」重排。解密：依金鑰字母順序（A→Z，相同字母由左到右）把密文分到各欄（共 ${m.length} 個符號；金鑰由左到右的前幾欄可能多一格），逐列讀出，兩個符號一組查方陣。`+tbl([[' ',...AD],...[0,1,2,3,4,5].map(r=>[AD[r],...G6.slice(r*6,r*6+6)])]),a:'金鑰 '+k}}}
+];
+let cur=0;
+// 證物編號＝在選單中的順序（依難度分組），不是陣列索引
+const ORD=C.map((c,i)=>i).sort((a,b)=>C[a].lv-C[b].lv||a-b);
+function draw(){const LV=['入門','進階','挑戰','高手','專家'];$('#chips').innerHTML=[1,2,3,4,5].map(l=>{const g=C.map((c,i)=>[c,i]).filter(x=>x[0].lv==l);return g.length?`<div class="gh">${'★'.repeat(l)} ${LV[l-1]}</div>`+g.map(([c,i])=>`<button class="chip" aria-pressed="${i==cur}" data-i="${i}">${c.n}</button>`).join(''):''}).join('')+'<div class="gh">其他（暫不實作）</div>'+OT.map(([n,r])=>`<button class="chip" disabled>${n}<small>步驟太繁瑣：${r}</small></button>`).join('');const c=C[cur];$('#desc').textContent='難度 '+'★'.repeat(c.lv)+' '+LV[c.lv-1]+'　'+c.d;
+$('#ps').innerHTML=c.p.map(q=>`<label for="p_${q.k}">${q.l}</label>`+(q.t=='select'?`<select id="p_${q.k}" data-k="${q.k}">${q.o.map(o=>`<option value="${o[0]}"${o[0]==q.v?' selected':''}>${o[1]}</option>`).join('')}</select>`:q.t=='area'?`<textarea id="p_${q.k}" data-k="${q.k}" rows="3">${q.v}</textarea>`:q.t=='check'?`<input type="checkbox" id="p_${q.k}" data-k="${q.k}">`:`<input id="p_${q.k}" data-k="${q.k}" type="${q.t}" value="${q.v}">`)).join('');go()}
+function go(){const p={};document.querySelectorAll('[data-k]').forEach(e=>p[e.dataset.k]=e.type=='checkbox'?e.checked:e.value);
+// 先正規化：只留 A–Z，空白只當單字分隔，避免數字與標點原樣出現在密文
+const s=W($('#ans').value,x=>x).join(' ');$('#no').textContent=String(ORD.indexOf(cur)+1).padStart(2,'0');
+if(!s){$('#out').textContent='請在答案欄輸入至少一個英文字母。';$('#hint').textContent='';$('#note').textContent='';$('#cp').disabled=true;return}
+const r=C[cur].run(s,p),svg=r.x!==undefined;
+$('#out').innerHTML=svg?r.x:esc(r.t);$('#hint').innerHTML=r.h;$('#note').textContent='答案：'+s+(r.a?'　｜　'+r.a:'');
+$('#cp').disabled=svg;$('#cp').title=svg?'圖形謎題無法複製成文字，請用列印或截圖':''}
+$('#chips').onclick=e=>{const b=e.target.closest('.chip');if(b){cur=+b.dataset.i;draw()}};
+document.addEventListener('input',e=>{if(e.target.closest('#pc')&&e.target.id!='pa')go()});
+$('#pa').onchange=()=>document.body.classList.toggle('pa',$('#pa').checked);
+$('#go').onclick=go;
+$('#cp').onclick=async()=>{try{await navigator.clipboard.writeText($('#out').innerText);$('#cp').textContent='已複製'}catch(e){$('#cp').textContent='請手動選取複製'}setTimeout(()=>$('#cp').textContent='複製謎題',1500)};
+$('#pr').onclick=()=>{document.body.classList.toggle('pa',$('#pa').checked);print()};
+const OT=[['Enigma 恩尼格瑪','三個轉子加接線板，要模擬整台機器'],['旋轉柵格 Grille','需要實體鏤空卡，並旋轉四次'],['Nihilist 虛無主義','方陣座標再做數字加法'],['Porta','13 組字母表，兩兩互換'],['Autokey','金鑰接上明文，逐字展開']];
+const CH=[
+{t:'銀斑駒',au:'柯南・道爾 1892',lv:1,s:'名馬「銀斑」在深夜從馬廄失蹤。馬廄裡有一隻看門狗，整晚都沒有叫。',q:'狗為什麼沒叫？這說明了什麼？',k:['認識','熟','familiar','knew'],h:'如果是陌生人闖進去，狗會有什麼反應？',e:'狗沒叫，代表帶走馬的是狗認識的人，嫌疑範圍立刻縮小到馬廄周圍的熟人。'},
+{t:'跳舞的人',au:'柯南・道爾 1903',lv:2,s:'鄉紳希爾頓的妻子艾爾西，不斷收到畫著跳舞小人的字條，嚇得面無血色。福爾摩斯發現這是代換密碼：最常出現的小人是 E，手持旗子的小人是單字結尾。',q:'這張字條呼喚的是誰的名字？',c:['跳舞小人','ELSIE',{f:true}],k:['elsie'],h:'共 5 個小人，先對照解碼表，再拼成一個女性名字。解碼表是本平台自訂的，與原作圖形不同。',e:'答案是 ELSIE，也就是希爾頓的妻子。原作中，這些字條是她舊識用來逼她現身的暗號。'},
+{t:'金甲蟲',au:'愛倫・坡 1843',lv:2,s:'勒格朗撿到一張羊皮紙，用火烘出一串奇怪的符號。他假設最常出現的符號是 E，再從 the 這類常見單字推敲，一步步破解藏寶線索。',q:'請解出這段符號寫成的兩個單字。',c:['黃金蟲密碼','GOOD GLASS',{}],k:['good glass'],h:'兩個單字，各有一組相連的相同符號。解碼表是本平台自訂的，與原作符號不完全相同。',e:'答案是 GOOD GLASS，是原作中指向藏寶位置的線索之一。'},
+{t:'紅髮會',au:'柯南・道爾 1891',lv:2,s:'當鋪老闆被「紅髮會」錄用，只要每天上午抄寫百科全書就有高薪。他每天照辦，直到某天門上貼出「紅髮會解散」。福爾摩斯發現他的店就在銀行隔壁。',q:'這個組織為什麼要付錢讓他每天外出抄書？',k:['挖','隧道','tunnel','金庫','銀行','支開','離開'],h:'他不在店裡時，誰最方便使用他的地下室？',e:'目的是支開他，讓歹徒從地下室挖地道，通往隔壁銀行的金庫。'},
+{t:'失竊的信',au:'愛倫・坡 1844',lv:3,s:'一封能脅迫貴婦人的信被大臣偷走。警方把大臣住處徹底搜遍，拆家具、量牆壁、用針戳沙發，一無所獲。杜邦只拜訪了大臣一次，就找到了信。',q:'大臣最可能把信放在哪裡？',k:['顯眼','明顯','plain sight','信架','桌上','眼前','公開'],h:'最安全的藏法，往往是讓人不會想去找的地方。',e:'信被隨意插在壁爐上方的信架，只改了外觀與封口，就沒人注意。越顯眼的地方，越容易被忽略。'},
+{t:'莫格街凶殺案',au:'愛倫・坡 1841',lv:3,s:'母女二人在上鎖的四樓房間被殺，現場凌亂，窗戶看似被釘死。目擊者都聽到兩種聲音：一種粗啞，一種尖銳，但沒人聽得出是哪國語言。現場還有一撮不像人類的毛髮。',q:'兇手是誰（或是什麼）？',k:['猩猩','猿','orangutan','ape','猴'],h:'聽不懂的聲音，也許根本不是語言。',e:'兇手是從窗戶爬進去的紅毛猩猩，原作中是水手帶回來的動物。窗上的釘子其實早已斷裂。'},
+{t:'斑點帶子',au:'柯南・道爾 1892',lv:3,s:'姊姊臨死前喊著「斑點帶子」，房門與窗戶都從內側上鎖。繼父養了許多印度動物。妹妹搬進那間房後發現：床被固定在地板、拉鈴繩沒有接鈴，床頭上方還有個通氣孔，通向繼父的房間。',q:'凶器是什麼？',k:['蛇','snake','adder'],h:'通氣孔、固定的床、一碟牛奶，想想什麼動物會沿著繩子爬下來。',e:'凶器是一條毒蛇。繼父用口哨和牛奶訓練牠，從通氣孔順著假拉鈴繩爬到床上。'}
+];
+let cc=0;const solved=new Set();
+function cases(){$('#cases').innerHTML=CH.map((x,i)=>`<button class="chip" aria-pressed="${i==cc}" data-j="${i}">${x.t}${solved.has(i)?' ✓':''}<small>${'★'.repeat(x.lv)}</small></button>`).join('')}
+function show(){const x=CH[cc];let pz='';if(x.c){const r=C.find(y=>y.n==x.c[0]).run(x.c[1],x.c[2]);pz=`<div class="pz">${r.x!==undefined?r.x:esc(r.t)}</div><details><summary>解碼對照表</summary><div class="sc">${r.h}</div></details>`}
+$('#cv').innerHTML=`${solved.has(cc)?'<span class="stamp">已破案</span>':''}<span class="tag">案件 ${cc+1}</span><h2>${x.t}</h2><p class="sub">${x.au}　難度 ${'★'.repeat(x.lv)}</p><p>${x.s}</p>${pz}<p><b>${x.q}</b></p><label for="ca">你的推論</label><input id="ca"><div class="row"><button class="b" id="ck">檢查答案</button><button class="b g" id="chn">提示</button><button class="b g" id="cs">看解答</button></div><p id="cr"></p>`}
+$('#cases').onclick=e=>{const b=e.target.closest('.chip');if(b){cc=+b.dataset.j;cases();show()}};
+$('#cv').onclick=e=>{const x=CH[cc],id=e.target.id;if(id=='ck'){const a=$('#ca').value.toLowerCase().replace(/\s+/g,' ').trim();if(a&&x.k.some(k=>a.includes(k))){solved.add(cc);show();cases();$('#cr').innerHTML='<b>破案！</b>'+x.e}else $('#cr').textContent='還差一點，再想想線索。'}else if(id=='chn')$('#cr').textContent='提示：'+x.h;else if(id=='cs')$('#cr').textContent='解答：'+x.e};
+const tab=b=>{const n=b.dataset.t;$('#pc').hidden=n!='c';$('#pch').hidden=n!='h';document.querySelectorAll('.tabs button').forEach(t=>{t.setAttribute('aria-selected',t==b);t.tabIndex=t==b?0:-1});if(n=='h'){cases();show()}};
+$('.tabs').onclick=e=>{const b=e.target.closest('button');if(b&&!b.disabled)tab(b)};
+// 分頁用左右鍵切換（WAI-ARIA tabs 慣例）
+$('.tabs').onkeydown=e=>{if(e.key!='ArrowLeft'&&e.key!='ArrowRight')return;const ts=[...document.querySelectorAll('.tabs button:not(:disabled)')],i=ts.indexOf(document.activeElement),b=ts[(i+(e.key=='ArrowRight'?1:-1)+ts.length)%ts.length];tab(b);b.focus()};
+draw();
+</script></body></html>

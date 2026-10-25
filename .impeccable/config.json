@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "reasoning-platform.html"
+        ],
+        "createdAt": "2026-10-25T16:33:13.666Z",
+        "reason": "Claude 判定：回報的 #8ea7b0、#e6eef0 是深色模式 token，實際底色 #0f1a1f（對比 6.99:1），掃描器誤用白底計算；淺色 --mut 已另行加深到 5.11:1"
+      }
+    ]
+  }
+}
